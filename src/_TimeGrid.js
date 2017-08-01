@@ -61,6 +61,11 @@ export default class TimeGrid extends Component {
 
     messages: PropTypes.object,
     components: PropTypes.object.isRequired,
+
+    groups: PropTypes.arrayOf(PropTypes.shape({
+     description: PropTypes.string,
+     value: PropTypes.any
+    }))
   }
 
   static defaultProps = {
@@ -103,8 +108,9 @@ export default class TimeGrid extends Component {
     window.clearTimeout(this._timeIndicatorTimeout);
   }
 
-  componentDidUpdate() {
-    if (this.props.width == null && !this.state.gutterWidth) {
+  componentDidUpdate(prevProps) {
+    if (this.shouldUpdateGutter(this.props, prevProps))
+    {
       this.measureGutter()
     }
 
@@ -115,6 +121,10 @@ export default class TimeGrid extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { range, scrollToTime } = this.props;
+    if(this.shouldUpdateGutter(this.props, nextProps))
+    {
+      this.setState({ gutterWidth: undefined })
+    }
     // When paginating, reset scroll
     if (
       !dates.eq(nextProps.range[0], range[0], 'minute') ||
@@ -122,6 +132,14 @@ export default class TimeGrid extends Component {
     ) {
       this.calculateScroll();
     }
+  }
+
+  shouldUpdateGutter(props, otherProps){
+    return props.width == null
+            && (
+              props.range[0].getTime() !== otherProps.range[0].getTime()
+              || props.groups != otherProps.groups
+            )
   }
 
   handleSelectAllDaySlot = (slots, slotInfo) => {
@@ -172,7 +190,8 @@ export default class TimeGrid extends Component {
 
     allDayEvents.sort((a, b) => sortEvents(a, b, this.props))
 
-    let gutterRef = ref => this._gutters[1] = ref && findDOMNode(ref);
+    // let gutterRef = ref => this._gutters[1] = ref && findDOMNode(ref);
+    this._gutters = [];
 
     return (
       <div className='rbc-time-view'>
@@ -183,14 +202,15 @@ export default class TimeGrid extends Component {
           {/* todo: remove these refs */}
           <div ref='timeIndicator' className='rbc-current-time-indicator' style={{display: 'none'}} />
           {/* Group Labels */}
-          <div
+          {/* todo: figure out width from text */}
+          {/* <div
             showLabels
             style={{ width: '60px', display: 'none' }}
             ref={gutterRef}
             className='rbc-time-gutter'
           >
             Test Test Test
-          </div>
+          </div> */}
           {this.renderEventGroups(range, rangeEvents, this.props.now, width)}
           {/* {this.renderEvents(range, rangeEvents, this.props.now)} */}
         </div>
@@ -201,15 +221,32 @@ export default class TimeGrid extends Component {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   renderEventGroups(range, events, today, width){
-    return events.reduce((acc, event)=>{
-      const key = event.group || 0;
-      const group = acc[key] || (acc[key] = []);
-      group.push(event);
+    let gutterRef = ref => this._gutters.push(ref && findDOMNode(ref));
+    // todo: this only needs to be done once, clean it up
+    const emptyGroups = this.props.groups.reduce((acc, group) => {
+      acc[group.value] = [];
+      acc[group.value].description = group.description;
       return acc;
-    }, [[]])
-    .map((eventGroup, i) =>
-        <div style={{display: 'flex'}} className="rbc-event-group" key={i}>
-          <div style={{width, padding: '0 5px', flex: 'none'}}></div>
+    }, {});
+    emptyGroups[undefined] = [];
+    const groupedEvents =  events.reduce((acc, event)=>{
+      acc[event.group].push(event)
+      return acc;
+    }, emptyGroups);
+    if(emptyGroups[undefined].length == 0) delete emptyGroups[undefined]
+    return Object.values(groupedEvents).map((eventGroup, i) =>
+        <div
+          style={{display: 'flex'}}
+          className="rbc-event-group"
+          key={i}
+        >
+          <div
+            className = "rbc-event-group-label"
+            style={{width, padding: '0 5px', flex: 'none'}}
+            ref={gutterRef}
+          >
+            {eventGroup.description || ''}
+          </div>
           {this.renderEvents(range, eventGroup, today)}
         </div>
     );
@@ -367,14 +404,15 @@ export default class TimeGrid extends Component {
 
   measureGutter() {
     let width = this.state.gutterWidth;
-    let gutterCells = this._gutters;
 
-    if (!width) {
-      width = Math.max(...gutterCells.map(getWidth));
+    if(!width)
+    {
+      let gutterCells = this._gutters;
+      width = Math.max(...gutterCells.filter(g => g != null).map(gutterCell => Math.ceil(getWidth(gutterCell))));
+    }
 
-      if (width) {
-        this.setState({ gutterWidth: width })
-      }
+    if (width) {
+      this.setState({ gutterWidth: width })
     }
   }
 

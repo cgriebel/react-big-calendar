@@ -9,6 +9,10 @@ import TimeGrid from './_TimeGrid';
 class Week extends React.Component {
   static propTypes = {
     date: PropTypes.instanceOf(Date).isRequired,
+    groups: PropTypes.arrayOf(PropTypes.shape({
+      description: PropTypes.string,
+      value: PropTypes.any
+    }))
   };
 
   static defaultProps = TimeGrid.defaultProps;

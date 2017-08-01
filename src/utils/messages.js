@@ -6,7 +6,7 @@ import invariant from 'invariant';
   event: 'Event',
   allDay: 'all day',
   week: 'week',
-  _week: '_week',
+  grouped_week: 'grouped week',
   work_week: 'work week',
   day: 'day',
   month: 'month',

@@ -1,3 +1,18 @@
+export const groups = [
+  {
+    description: 'Tim',
+    value: 1
+  },
+  {
+    description: 'Joe',
+    value: 2
+  },
+  {
+    description: 'Chris',
+    value: 3
+  },
+];
+
 export default [
   {
     'title': 'All Day Event',
@@ -44,23 +59,24 @@ export default [
   },
   {
     'title': 'Lunch',
-    'start':new Date(2015, 3, 12, 12, 0, 0, 0),
-    'end': new Date(2015, 3, 12, 13, 0, 0, 0),
+    'start':new Date(2015, 3, 12, 6, 0, 0, 0),
+    'end': new Date(2015, 3, 12, 14, 0, 0, 0),
     desc: 'Power lunch',
     group: 2
   },
   {
     'title': 'Meeting',
-    'start':new Date(2015, 3, 12,14, 0, 0, 0),
-    'end': new Date(2015, 3, 12,15, 0, 0, 0),
+    'start':new Date(2015, 3, 12, 14, 0, 0, 0),
+    'end': new Date(2015, 3, 12, 15, 0, 0, 0),
     group: 1
   },
   {
     'title': 'Happy Hour',
-    'start':new Date(2015, 3, 12, 17, 0, 0, 0),
+    'start':new Date(2015, 3, 12, 9, 0, 0, 0),
     'end': new Date(2015, 3, 12, 17, 30, 0, 0),
     desc: 'Most important meal of the day',
-    group: 3
+    group: 3,
+    groupName: 'Default, Programmer'
   },
   {
     'title': 'Dinner',

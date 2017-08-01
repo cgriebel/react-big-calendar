@@ -453,7 +453,15 @@ class Calendar extends React.Component {
      day: PropTypes.node,
      agenda: PropTypes.node,
      showMore: PropTypes.func
-   })
+   }),
+
+   /**
+    * Group descriptions for Group Week view.
+    */
+   groups: PropTypes.arrayOf(PropTypes.shape({
+     description: PropTypes.string,
+     value: PropTypes.any
+   }))
  };
 
  static defaultProps = {
@@ -461,7 +469,7 @@ class Calendar extends React.Component {
    popup: false,
    toolbar: true,
    view: views.MONTH,
-   views: [views.MONTH, views.WEEK, views.DAY, views.AGENDA, views._WEEK],
+   views: [views.MONTH, views.WEEK, views.DAY, views.AGENDA, views.GROUPED_WEEK],
    date: now,
    step: 30,
 
@@ -470,7 +478,8 @@ class Calendar extends React.Component {
    titleAccessor: 'title',
    allDayAccessor: 'allDay',
    startAccessor: 'start',
-   endAccessor: 'end'
+   endAccessor: 'end',
+   groups: []
  };
 
  getViews = () => {

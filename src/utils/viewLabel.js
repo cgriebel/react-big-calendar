@@ -7,7 +7,7 @@ import VIEWS from '../Views'
 const Formats = {
   [views.MONTH]: 'monthHeaderFormat',
   [views.WEEK]: 'dayRangeHeaderFormat',
-  [views._WEEK]: 'dayRangeHeaderFormat',
+  [views.GROUPED_WEEK]: 'dayRangeHeaderFormat',
   [views.WORK_WEEK]: 'dayRangeHeaderFormat',
   [views.DAY]: 'dayHeaderFormat',
   [views.AGENDA]: 'agendaHeaderFormat',
