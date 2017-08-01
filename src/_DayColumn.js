@@ -14,7 +14,7 @@ import { accessor as get } from './utils/accessors';
 
 import getStyledEvents, { positionFromDate, startsBefore } from './utils/dayViewLayout'
 
-import TimeColumn from './TimeColumn'
+import TimeColumn from './_TimeColumn'
 
 function snapToSlot(date, step){
   var roundTo = 1000 * 60 * step;
@@ -164,10 +164,11 @@ class DaySlot extends React.Component {
           <div
             style={{
               ...xStyle,
-              top: `${top}%`,
-              height: `${height}%`,
-              [isRtl ? 'right' : 'left']: `${Math.max(0, xOffset)}%`,
-              width: `${width}%`
+              // todo: rename these
+              left: `${top}%`,
+              height: `${width}%`,
+              top: `${Math.max(0, xOffset)}%`,
+              width: `${height}%`
             }}
             title={label + ': ' + title }
             onClick={(e) => this._select(event, e)}

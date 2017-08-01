@@ -4,7 +4,7 @@ import dates from './utils/dates';
 import localizer from './localizer';
 import { navigate } from './utils/constants';
 
-import TimeGrid from './TimeGrid';
+import TimeGrid from './_TimeGrid';
 
 class Week extends React.Component {
   static propTypes = {

@@ -5,8 +5,8 @@ import { findDOMNode } from 'react-dom';
 
 import dates from './utils/dates';
 import localizer from './localizer'
-import DayColumn from './DayColumn';
-import TimeColumn from './TimeColumn';
+import DayColumn from './_DayColumn';
+import TimeColumn from './_TimeColumn';
 import DateContentRow from './DateContentRow';
 import Header from './Header';
 
@@ -179,19 +179,20 @@ export default class TimeGrid extends Component {
 
         {this.renderHeader(range, allDayEvents, width)}
 
-        <div ref='content' className='rbc-time-content'>
-          <div ref='timeIndicator' className='rbc-current-time-indicator' />
-
-          <TimeColumn
-            {...this.props}
+        <div ref='content' className='rbc-time-content' style={{display: 'block'}}>
+          {/* todo: remove these refs */}
+          <div ref='timeIndicator' className='rbc-current-time-indicator' style={{display: 'none'}} />
+          {/* Group Labels */}
+          <div
             showLabels
-            style={{ width }}
+            style={{ width: '60px', display: 'none' }}
             ref={gutterRef}
             className='rbc-time-gutter'
-          />
-
-          {this.renderEvents(range, rangeEvents, this.props.now)}
-
+          >
+            Test Test Test
+          </div>
+          {this.renderEventGroups(range, rangeEvents, this.props.now, width)}
+          {/* {this.renderEvents(range, rangeEvents, this.props.now)} */}
         </div>
       </div>
     );
@@ -199,9 +200,23 @@ export default class TimeGrid extends Component {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  renderEventGroups(range, events, today, width){
+    return events.reduce((acc, event)=>{
+      const key = event.group || 0;
+      const group = acc[key] || (acc[key] = []);
+      group.push(event);
+      return acc;
+    }, [[]])
+    .map((eventGroup, i) =>
+        <div style={{display: 'flex'}} className="rbc-event-group" key={i}>
+          <div style={{width, padding: '0 5px', flex: 'none'}}></div>
+          {this.renderEvents(range, eventGroup, today)}
+        </div>
+    );
+  }
+
   renderEvents(range, events, today){
     let { min, max, endAccessor, startAccessor, components } = this.props;
-
     return range.map((date, idx) => {
       let daysEvents = events.filter(
         event => dates.inRange(date,
@@ -395,27 +410,27 @@ export default class TimeGrid extends Component {
   }
 
   positionTimeIndicator() {
-    const { rtl, min, max } = this.props
-    const now = new Date();
+    // const { rtl, min, max } = this.props
+    // const now = new Date();
 
-    const secondsGrid = dates.diff(max, min, 'seconds');
-    const secondsPassed = dates.diff(now, min, 'seconds');
+    // const secondsGrid = dates.diff(max, min, 'seconds');
+    // const secondsPassed = dates.diff(now, min, 'seconds');
 
     const timeIndicator = this.refs.timeIndicator;
-    const factor = secondsPassed / secondsGrid;
-    const timeGutter = this._gutters[this._gutters.length - 1];
+    // const factor = secondsPassed / secondsGrid;
+    // const timeGutter = this._gutters[this._gutters.length - 1];
 
-    if (timeGutter && now >= min && now <= max) {
-      const pixelHeight = timeGutter.offsetHeight;
-      const offset = Math.floor(factor * pixelHeight);
+    // if (timeGutter && now >= min && now <= max) {
+    //   const pixelHeight = timeGutter.offsetHeight;
+    //   const offset = Math.floor(factor * pixelHeight);
 
-      timeIndicator.style.display = 'block';
-      timeIndicator.style[rtl ? 'left' : 'right'] = 0;
-      timeIndicator.style[rtl ? 'right' : 'left'] = timeGutter.offsetWidth + 'px';
-      timeIndicator.style.top = offset + 'px';
-    } else {
+    //   timeIndicator.style.display = 'block';
+    //   timeIndicator.style[rtl ? 'left' : 'right'] = 0;
+    //   timeIndicator.style[rtl ? 'right' : 'left'] = timeGutter.offsetWidth + 'px';
+    //   timeIndicator.style.top = offset + 'px';
+    // } else {
       timeIndicator.style.display = 'none';
-    }
+    // }
   }
 
   triggerTimeIndicatorUpdate() {

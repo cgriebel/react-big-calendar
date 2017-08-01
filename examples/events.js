@@ -3,7 +3,8 @@ export default [
     'title': 'All Day Event',
     'allDay': true,
     'start': new Date(2015, 3, 0),
-    'end': new Date(2015, 3, 1)
+    'end': new Date(2015, 3, 1),
+    group: 1
   },
   {
     'title': 'Long Event',
@@ -38,24 +39,28 @@ export default [
     'title': 'Meeting',
     'start': new Date(2015, 3, 12, 10, 30, 0, 0),
     'end': new Date(2015, 3, 12, 12, 30, 0, 0),
-    desc: 'Pre-meeting meeting, to prepare for the meeting'
+    desc: 'Pre-meeting meeting, to prepare for the meeting',
+    group: 1
   },
   {
     'title': 'Lunch',
     'start':new Date(2015, 3, 12, 12, 0, 0, 0),
     'end': new Date(2015, 3, 12, 13, 0, 0, 0),
-    desc: 'Power lunch'
+    desc: 'Power lunch',
+    group: 2
   },
   {
     'title': 'Meeting',
     'start':new Date(2015, 3, 12,14, 0, 0, 0),
-    'end': new Date(2015, 3, 12,15, 0, 0, 0)
+    'end': new Date(2015, 3, 12,15, 0, 0, 0),
+    group: 1
   },
   {
     'title': 'Happy Hour',
     'start':new Date(2015, 3, 12, 17, 0, 0, 0),
     'end': new Date(2015, 3, 12, 17, 30, 0, 0),
-    desc: 'Most important meal of the day'
+    desc: 'Most important meal of the day',
+    group: 3
   },
   {
     'title': 'Dinner',
