@@ -93,6 +93,10 @@
     border-left: 1px solid @cell-border;
   }
 
+  > * + * > .rbc-date-grid > * {
+    border-left: 1px solid @cell-border;
+  }
+
   .rbc-rtl & > * + * > * {
     border-left-width: 0;
     border-right: 1px solid @cell-border;
@@ -112,9 +116,18 @@
       border-left: none;
     }
 
-    > .rbc-day-slot {
-      width: 100%;
-      user-select: none;
+    > div {
+      display: flex;
+      flex: 1 1;
+
+      > .rbc-day-slot {
+        width: 100%;
+        user-select: none;
+      }
+      
+      > .rbc-day-slot.selected {
+        background-color: black;
+      }
     }
   }
 }

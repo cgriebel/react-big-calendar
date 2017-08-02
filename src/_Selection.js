@@ -18,7 +18,7 @@ export function isEvent(node, { clientX, clientY, }) {
   return !!closest(target, '.rbc-event', node)
 }
 
-const clickTolerance = 5;
+const clickTolerance = 0;
 
 class Selection {
 
@@ -91,12 +91,12 @@ class Selection {
   _mouseDown (e) {
     var node = this.container()
       , collides, offsetData;
+      
     // Right clicks
     if (
       e.which === 3 ||
       e.button === 2 ||
       !isOverContainer(node, e.clientX, e.clientY)
-
     )
       return;
 

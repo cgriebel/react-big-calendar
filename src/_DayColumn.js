@@ -3,7 +3,7 @@ import React from 'react';
 import { findDOMNode } from 'react-dom';
 import cn from 'classnames';
 
-import Selection, { getBoundsForNode, isEvent } from './Selection';
+import Selection, { getBoundsForNode, isEvent } from './_Selection';
 import dates from './utils/dates';
 import { isSelected } from './utils/selection';
 import localizer from './localizer'
@@ -57,19 +57,21 @@ class DaySlot extends React.Component {
     dayWrapperComponent: elementType,
     eventComponent: elementType,
     eventWrapperComponent: elementType.isRequired,
+
+    container: PropTypes.func
   };
 
   static defaultProps = { dragThroughEvents: true };
   state = { selecting: false };
 
-  componentDidMount() {
-    this.props.selectable
-    && this._selectable()
-  }
+  // componentDidMount() {
+  //   this.props.selectable
+  //   && this._selectable()
+  // }
 
-  componentWillUnmount() {
-    this._teardownSelectable();
-  }
+  // componentWillUnmount() {
+  //   this._teardownSelectable();
+  // }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectable && !this.props.selectable)
@@ -86,6 +88,7 @@ class DaySlot extends React.Component {
       now,
       selectRangeFormat,
       culture,
+      className,
       ...props
     } = this.props
 
@@ -104,7 +107,8 @@ class DaySlot extends React.Component {
         {...props}
         className={cn(
           'rbc-day-slot',
-          dates.isToday(max) && 'rbc-today'
+          dates.isToday(max) && 'rbc-today',
+          className
         )}
         now={now}
         min={min}
@@ -114,9 +118,8 @@ class DaySlot extends React.Component {
         {this.renderEvents()}
 
         {selecting &&
-          <div className='rbc-slot-selection' style={style}>
+          <div className='rbc-slot-selection' style={{ top: '0', height: '100%', width: '100%'}}>
               <span>
-              { localizer.format(selectDates, selectRangeFormat, culture) }
               </span>
           </div>
         }
@@ -201,91 +204,77 @@ class DaySlot extends React.Component {
     }
   };
 
-  _selectable = () => {
-    let node = findDOMNode(this);
-    let selector = this._selector = new Selection(()=> findDOMNode(this))
+  // _selectable = () => {
+  //   let node = findDOMNode(this);
+  //   let selector = this._selector = new Selection(this.props.container)
 
-    let maybeSelect = (box) => {
-      let onSelecting = this.props.onSelecting
-      let current = this.state || {};
-      let state = selectionState(box);
-      let { startDate: start, endDate: end } = state;
+  //   let maybeSelect = () => {
+  //     this.setState({ selecting: selector.isSelected(node) });
+  //   }
 
-      if (onSelecting) {
-        if (
-          (dates.eq(current.startDate, start, 'minutes') &&
-          dates.eq(current.endDate, end, 'minutes')) ||
-          onSelecting({ start, end }) === false
-        )
-          return
-      }
+  //   let selectionState = ({ y }) => {
+  //     let { step, min, max } = this.props;
+  //     let { top, bottom } = getBoundsForNode(node)
 
-      this.setState(state)
-    }
+  //     let mins = this._totalMin;
 
-    let selectionState = ({ y }) => {
-      let { step, min, max } = this.props;
-      let { top, bottom } = getBoundsForNode(node)
+  //     let range = Math.abs(top - bottom)
 
-      let mins = this._totalMin;
+  //     let current = (y - top) / range;
 
-      let range = Math.abs(top - bottom)
+  //     current = snapToSlot(minToDate(mins * current, min), step)
 
-      let current = (y - top) / range;
+  //     if (!this.state.selecting)
+  //       this._initialDateSlot = current
 
-      current = snapToSlot(minToDate(mins * current, min), step)
+  //     let initial = this._initialDateSlot;
 
-      if (!this.state.selecting)
-        this._initialDateSlot = current
+  //     if (dates.eq(initial, current, 'minutes'))
+  //       current = dates.add(current, step, 'minutes')
 
-      let initial = this._initialDateSlot;
+  //     let start = dates.max(min, dates.min(initial, current))
+  //     let end = dates.min(max, dates.max(initial, current))
 
-      if (dates.eq(initial, current, 'minutes'))
-        current = dates.add(current, step, 'minutes')
+  //     return {
+  //       selecting: true,
+  //       startDate: start,
+  //       endDate: end,
+  //       startSlot: positionFromDate(start, min, this._totalMin),
+  //       endSlot: positionFromDate(end, min, this._totalMin)
+  //     }
+  //   }
 
-      let start = dates.max(min, dates.min(initial, current))
-      let end = dates.min(max, dates.max(initial, current))
+  //   selector.on('selecting', maybeSelect)
+  //   selector.on('selectStart', maybeSelect)
 
-      return {
-        selecting: true,
-        startDate: start,
-        endDate: end,
-        startSlot: positionFromDate(start, min, this._totalMin),
-        endSlot: positionFromDate(end, min, this._totalMin)
-      }
-    }
+  //   selector.on('mousedown', (box) => {
+  //     if (this.props.selectable !== 'ignoreEvents') return
 
-    selector.on('selecting', maybeSelect)
-    selector.on('selectStart', maybeSelect)
+  //     return !isEvent(findDOMNode(this), box)
+  //   })
 
-    selector.on('mousedown', (box) => {
-      if (this.props.selectable !== 'ignoreEvents') return
+  //   selector
+  //     .on('click', (box) => {
+  //       if (!isEvent(findDOMNode(this), box))
+  //         this._selectSlot({ ...selectionState(box), action: 'click' })
 
-      return !isEvent(findDOMNode(this), box)
-    })
+  //       this.setState({ selecting: false })
+  //     })
 
-    selector
-      .on('click', (box) => {
-        if (!isEvent(findDOMNode(this), box))
-          this._selectSlot({ ...selectionState(box), action: 'click' })
+  //   selector
+  //     .on('select', () => {
+  //       if (this.state.selecting) {
+  //         this._selectSlot({ ...this.state, action: 'select' })
+  //         this.setState({ selecting: false })
+  //       }
+  //     })
+  // };
 
-        this.setState({ selecting: false })
-      })
-
-    selector
-      .on('select', () => {
-        if (this.state.selecting) {
-          this._selectSlot({ ...this.state, action: 'select' })
-          this.setState({ selecting: false })
-        }
-      })
-  };
-
-  _teardownSelectable = () => {
-    if (!this._selector) return
-    this._selector.teardown();
-    this._selector = null;
-  };
+  // _teardownSelectable = () => {
+  //   if (!this._selector) return
+  //   this._selector.teardown();
+  //   this._selector = null;
+  // };
 
   _selectSlot = ({ startDate, endDate, action }) => {
     let current = startDate

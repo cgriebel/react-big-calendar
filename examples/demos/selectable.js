@@ -1,6 +1,6 @@
 import React from 'react';
 import BigCalendar from 'react-big-calendar';
-import events from '../events';
+import events, { groups } from '../events';
 
 let Selectable = React.createClass({
   render(){
@@ -21,6 +21,7 @@ let Selectable = React.createClass({
             `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
             `\nend: ${slotInfo.end.toLocaleString()}`
           )}
+          groups={groups}
         />
       </div>
     )

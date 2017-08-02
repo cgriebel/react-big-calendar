@@ -6,9 +6,10 @@ import { findDOMNode } from 'react-dom';
 import dates from './utils/dates';
 import localizer from './localizer'
 import DayColumn from './_DayColumn';
-import TimeColumn from './_TimeColumn';
-import DateContentRow from './DateContentRow';
+import DateContentGrid from './_DateContentGrid';
+import DateContentRow from './_DateContentRow';
 import Header from './Header';
+import Selection, { getBoundsForNode, isEvent } from './_Selection';
 
 import getWidth from 'dom-helpers/query/width';
 import scrollbarSize from 'dom-helpers/util/scrollbarSize';
@@ -102,11 +103,95 @@ export default class TimeGrid extends Component {
 
     this.positionTimeIndicator();
     this.triggerTimeIndicatorUpdate();
+
+    // this.props.selectable
+    // && this._selectable()
   }
 
   componentWillUnmount() {
     window.clearTimeout(this._timeIndicatorTimeout);
+    // this._teardownSelectable();
   }
+
+  _selectable = () => {
+    let node = findDOMNode(this);
+    let selector = this._selector = new Selection(() => node);
+    let bounds;
+
+    let maybeSelect = (box) => {
+      const selected = selector.isSelected(node);
+      if(!this.state.selecting){
+        bounds = getBoundsForNode(node);
+      }
+      if(selected){
+        // do something to color events
+      }
+      this.setState({ selecting: selected });
+    }
+
+    // let selectionState = ({ y }) => {
+    //   let { step, min, max } = this.props;
+    //   let { top, bottom } = getBoundsForNode(node)
+
+    //   let mins = this._totalMin;
+
+    //   let range = Math.abs(top - bottom)
+
+    //   let current = (y - top) / range;
+
+    //   current = snapToSlot(minToDate(mins * current, min), step)
+
+    //   if (!this.state.selecting)
+    //     this._initialDateSlot = current
+
+    //   let initial = this._initialDateSlot;
+
+    //   if (dates.eq(initial, current, 'minutes'))
+    //     current = dates.add(current, step, 'minutes')
+
+    //   let start = dates.max(min, dates.min(initial, current))
+    //   let end = dates.min(max, dates.max(initial, current))
+
+    //   return {
+    //     selecting: true,
+    //     startDate: start,
+    //     endDate: end,
+    //     startSlot: positionFromDate(start, min, this._totalMin),
+    //     endSlot: positionFromDate(end, min, this._totalMin)
+    //   }
+    // }
+
+    selector.on('selecting', maybeSelect)
+    selector.on('selectStart', maybeSelect)
+
+    selector.on('mousedown', (box) => {
+      if (this.props.selectable !== 'ignoreEvents') return
+
+      return !isEvent(findDOMNode(this), box)
+    })
+
+    selector
+      .on('click', (box) => {
+        // if (!isEvent(findDOMNode(this), box))
+        //   this._selectSlot({ ...selectionState(box), action: 'click' })
+
+        this.setState({ selecting: false })
+      })
+
+    selector
+      .on('select', () => {
+        if (this.state.selecting) {
+          // this._selectSlot({ ...this.state, action: 'select' })
+          this.setState({ selecting: false })
+        }
+      })
+  };
+
+  _teardownSelectable = () => {
+    if (!this._selector) return
+    this._selector.teardown();
+    this._selector = null;
+  };
 
   componentDidUpdate(prevProps) {
     if (this.shouldUpdateGutter(this.props, prevProps))
@@ -190,7 +275,6 @@ export default class TimeGrid extends Component {
 
     allDayEvents.sort((a, b) => sortEvents(a, b, this.props))
 
-    // let gutterRef = ref => this._gutters[1] = ref && findDOMNode(ref);
     this._gutters = [];
 
     return (
@@ -201,24 +285,11 @@ export default class TimeGrid extends Component {
         <div ref='content' className='rbc-time-content' style={{display: 'block'}}>
           {/* todo: remove these refs */}
           <div ref='timeIndicator' className='rbc-current-time-indicator' style={{display: 'none'}} />
-          {/* Group Labels */}
-          {/* todo: figure out width from text */}
-          {/* <div
-            showLabels
-            style={{ width: '60px', display: 'none' }}
-            ref={gutterRef}
-            className='rbc-time-gutter'
-          >
-            Test Test Test
-          </div> */}
           {this.renderEventGroups(range, rangeEvents, this.props.now, width)}
-          {/* {this.renderEvents(range, rangeEvents, this.props.now)} */}
         </div>
       </div>
     );
   }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   renderEventGroups(range, events, today, width){
     let gutterRef = ref => this._gutters.push(ref && findDOMNode(ref));
@@ -247,7 +318,14 @@ export default class TimeGrid extends Component {
           >
             {eventGroup.description || ''}
           </div>
-          {this.renderEvents(range, eventGroup, today)}
+             <DateContentGrid
+              {...this.props}
+              range={range}
+              events={eventGroup}
+              now={today}
+              container={this.getContainer}
+            />
+            {/* {this.renderEvents(range, eventGroup, today)} */}
         </div>
     );
   }
@@ -274,12 +352,13 @@ export default class TimeGrid extends Component {
           key={idx}
           date={date}
           events={daysEvents}
+          container={this.getContainer}
         />
       )
     })
   }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  getContainer = () => findDOMNode(this);
 
   renderHeader(range, events, width) {
     let { messages, rtl, selectable, components, now } = this.props;
