@@ -19,6 +19,10 @@
   border: 1px solid @calendar-border;
   min-height: 0;
 
+  &.rbc-time-view-grouped {
+    flex: 0;
+  }
+
   .rbc-time-gutter {
     white-space: nowrap;
   }
@@ -110,10 +114,17 @@
   > .rbc-event-group {
     width: 100%;
     user-select: none;
+    position: relative;
     
     .rbc-event-group-label {
       border-bottom: 1px solid @cell-border;
       border-left: none;
+    }
+    .rbc-date-grid {
+      position: relative;
+      .rbc-row-bg {
+        border: none;
+      }
     }
 
     > div {

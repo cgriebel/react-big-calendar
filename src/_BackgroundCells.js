@@ -7,7 +7,7 @@ import dates from './utils/dates';
 import { segStyle } from './utils/eventLevels';
 import { notify } from './utils/helpers';
 import { elementType } from './utils/propTypes';
-import { dateCellSelection, slotWidth, getCellAtX, pointInBox } from './utils/selection';
+import { dayGroupedCellSelection, slotWidth, getCellAtX, pointInBox } from './utils/selection';
 import Selection, { getBoundsForNode, isEvent } from './_Selection';
 
 class BackgroundCells extends React.Component {
@@ -26,6 +26,8 @@ class BackgroundCells extends React.Component {
     ),
     rtl: PropTypes.bool,
     type: PropTypes.string,
+
+    group: PropTypes.any
   }
 
   constructor(props, context) {
@@ -61,19 +63,23 @@ class BackgroundCells extends React.Component {
       <div className='rbc-row-bg'>
         {range.map((date, index) => {
           let selected =  selecting && index >= startIdx && index <= endIdx;
+          const style= segStyle(1, range.length);
+          const className = cn(
+            'rbc-day-bg',
+            selected && 'rbc-selected-cell',
+            dates.isToday(date) && 'rbc-today',
+          );
           return (
             <Wrapper
               key={index}
               value={date}
               range={range}
+              selected={selected}
+              style={style}
             >
               <div
-                style={segStyle(1, range.length)}
-                className={cn(
-                  'rbc-day-bg',
-                  selected && 'rbc-selected-cell',
-                  dates.isToday(date) && 'rbc-today',
-                )}
+                style={style}
+                className={className}
               />
             </Wrapper>
           )
@@ -99,7 +105,7 @@ class BackgroundCells extends React.Component {
       if (selector.isSelected(node)) {
         let nodeBox = getBoundsForNode(node);
 
-        ({ startIdx, endIdx } = dateCellSelection(
+        ({ startIdx, endIdx } = dayGroupedCellSelection(
             this._initial
           , nodeBox
           , box
@@ -162,7 +168,8 @@ class BackgroundCells extends React.Component {
         this.props.onSelectSlot({
           start: startIdx,
           end: endIdx,
-          action
+          action,
+          group: this.props.group
         })
   }
 }

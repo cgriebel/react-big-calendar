@@ -91,7 +91,6 @@ class Selection {
   _mouseDown (e) {
     var node = this.container()
       , collides, offsetData;
-      
     // Right clicks
     if (
       e.which === 3 ||

@@ -82,3 +82,32 @@ export function dateCellSelection(start, rowBox, box, slots, rtl){
 
   return { startIdx, endIdx }
 }
+
+export function dayGroupedCellSelection(start, rowBox, box, slots, rtl){
+  let startIdx = -1;
+  let endIdx = -1;
+  let cellWidth = slotWidth(rowBox, slots);
+
+  // cell under the mouse
+  let currentSlot = getCellAtX(rowBox, box.x, cellWidth, rtl, slots);
+
+  // get start cell
+  let startSlot = getCellAtX(rowBox, start.x, cellWidth, rtl, slots);
+
+  // Identify row as either the initial row
+  // or the row under the current mouse point
+  let isCurrentRow = rowBox.top < box.y && rowBox.bottom > box.y
+  let isStartRow = rowBox.top < start.y && rowBox.bottom > start.y
+  let isBetween = box.top < rowBox.top && box.bottom > rowBox.bottom
+
+  if(isCurrentRow || isStartRow || isBetween){
+    if(currentSlot > startSlot){
+      startIdx = startSlot;
+      endIdx = currentSlot;
+    } else {
+      startIdx = currentSlot;
+      endIdx = startSlot;
+    }
+  }
+  return { startIdx, endIdx }
+}
