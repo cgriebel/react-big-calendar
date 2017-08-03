@@ -85,6 +85,7 @@ export default class TimeGrid extends Component {
     this.state = { gutterWidth: undefined, isOverflowing: null };
     this.handleSelectEvent = this.handleSelectEvent.bind(this)
     this.handleHeaderClick = this.handleHeaderClick.bind(this)
+    this.currentGroup = this.startGroup = null;
   }
 
   componentWillMount() {
@@ -251,7 +252,7 @@ export default class TimeGrid extends Component {
                 container={this.getContainer}
                 onSelectStart={onSelectStart}
                 onSelectEnd={onSelectEnd}
-                onSelectSlot={onSelectSlot}
+                onSelectSlot={this.handleSelectSlot}
                 cellWrapperComponent={dateCellWrapper}
                 group={eventGroup.value}
               />
@@ -399,6 +400,20 @@ export default class TimeGrid extends Component {
 
   handleSelectEvent(...args) {
     notify(this.props.onSelectEvent, args)
+  }
+
+  handleSelectSlot = ({ start, end, action, group, isCurrent, isStart}) => {
+    const { onSelectSlot, groups, range } = this.props;
+    if(isCurrent) this.currentGroup = group;
+    if(isStart) this.startGroup = group;
+    if(this.currentGroup !== null && this.startGroup !== null){
+      console.log('Fire onSelectSlot');
+      let groupStart = groups.findIndex(g => g.value === this.currentGroup);
+      let groupEnd = groups.findIndex(g => g.value === this.startGroup);
+      if(groupStart > groupEnd) [groupStart, groupEnd] = [groupEnd, groupStart]
+      onSelectSlot({ start: range[start], end: range[end], action, groups: groups.slice(groupStart, groupEnd + 1) });
+      this.currentGroup = this.startGroup = null;
+    }
   }
 
   handleSelectAlldayEvent(...args) {

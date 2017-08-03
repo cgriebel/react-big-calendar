@@ -76,6 +76,7 @@ class BackgroundCells extends React.Component {
               range={range}
               selected={selected}
               style={style}
+                className={className}
             >
               <div
                 style={style}
@@ -97,6 +98,8 @@ class BackgroundCells extends React.Component {
 
       let startIdx = -1;
       let endIdx = -1;
+      let isCurrent;
+      let isStart;
 
       if (!this.state.selecting) {
         notify(this.props.onSelectStart, [box]);
@@ -105,7 +108,7 @@ class BackgroundCells extends React.Component {
       if (selector.isSelected(node)) {
         let nodeBox = getBoundsForNode(node);
 
-        ({ startIdx, endIdx } = dayGroupedCellSelection(
+        ({ startIdx, endIdx, isCurrent, isStart } = dayGroupedCellSelection(
             this._initial
           , nodeBox
           , box
@@ -115,7 +118,8 @@ class BackgroundCells extends React.Component {
 
       this.setState({
         selecting: true,
-        startIdx, endIdx
+        startIdx, endIdx,
+        isCurrent, isStart
       })
     })
 
@@ -139,6 +143,8 @@ class BackgroundCells extends React.Component {
               startIdx: currentCell,
               endIdx: currentCell,
               action: 'click',
+              isStart: true,
+              isCurrent: true
             })
           }
         }
@@ -162,14 +168,16 @@ class BackgroundCells extends React.Component {
     this._selector = null;
   }
 
-  _selectSlot({ endIdx, startIdx, action }) {
+  _selectSlot({ endIdx, startIdx, action, isStart, isCurrent }) {
     if (endIdx !== -1 && startIdx !== -1)
       this.props.onSelectSlot &&
         this.props.onSelectSlot({
           start: startIdx,
           end: endIdx,
           action,
-          group: this.props.group
+          isStart,
+          isCurrent,
+          group: this.props.group,
         })
   }
 }

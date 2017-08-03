@@ -20,7 +20,7 @@ let Selectable = React.createClass({
           onSelectSlot={(slotInfo) => alert(
             `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
             `\nend: ${slotInfo.end.toLocaleString()}` +
-            `\ngroup: ${slotInfo.group}`
+            `\ngroups: ${JSON.stringify(slotInfo.groups)}`
           )}
           groups={groups}
         />

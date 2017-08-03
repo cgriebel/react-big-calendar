@@ -54,7 +54,7 @@ class BackgroundCells extends React.Component {
   }
 
   render(){
-    let { range, cellWrapperComponent: Wrapper } = this.props;
+    let { range, cellWrapperComponent: Wrapper, group } = this.props;
     let { selecting, startIdx, endIdx } = this.state;
 
     return (
@@ -66,6 +66,7 @@ class BackgroundCells extends React.Component {
               key={index}
               value={date}
               range={range}
+              group={group}
             >
               <div
                 style={segStyle(1, range.length)}

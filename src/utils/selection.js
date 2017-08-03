@@ -96,11 +96,11 @@ export function dayGroupedCellSelection(start, rowBox, box, slots, rtl){
 
   // Identify row as either the initial row
   // or the row under the current mouse point
-  let isCurrentRow = rowBox.top < box.y && rowBox.bottom > box.y
-  let isStartRow = rowBox.top < start.y && rowBox.bottom > start.y
+  let isCurrent = rowBox.top < box.y && rowBox.bottom > box.y
+  let isStart = rowBox.top < start.y && rowBox.bottom > start.y
   let isBetween = box.top < rowBox.top && box.bottom > rowBox.bottom
 
-  if(isCurrentRow || isStartRow || isBetween){
+  if(isCurrent || isStart || isBetween){
     if(currentSlot > startSlot){
       startIdx = startSlot;
       endIdx = currentSlot;
@@ -109,5 +109,5 @@ export function dayGroupedCellSelection(start, rowBox, box, slots, rtl){
       endIdx = startSlot;
     }
   }
-  return { startIdx, endIdx }
+  return { startIdx, endIdx,  isCurrent, isStart }
 }
